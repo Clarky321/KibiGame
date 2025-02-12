@@ -1,29 +1,37 @@
 cmake_minimum_required(VERSION 3.12)
 
-set(ENGINE_PROJECT_NAME KibiGameCore)
+project(KibiGameCore LANGUAGES CXX)
 
-set(ENGINE_PUBLIC_INCLUDES
+# Исходные файлы
+set(ENGINE_HEADERS
     includes/KibiGameCore/test.h
 )
 
-set(ENGINE_PRIVATE_SOURCES
+set(ENGINE_SOURCES
     src/KibiGameCore/test.cpp
 )
 
-set(ENGINE_ALL_SOURCE
-	${ENGINE_PUBLIC_INCLUDES}
-	${ENGINE_PRIVATE_SOURCES}
+# Создание статической библиотеки
+add_library(${PROJECT_NAME} STATIC
+    ${ENGINE_SOURCES}
+    ${ENGINE_HEADERS}
 )
 
-add_library(${ENGINE_PROJECT_NAME} STATIC ${ENGINE_ALL_SOURCE})
-
-target_include_directories(${ENGINE_PROJECT_NAME}
-	PUBLIC
-		includes
-	PRIVATE
-		src
+# Настройка include-директорий
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/includes>
+        $<INSTALL_INTERFACE:includes>
+    PRIVATE
+        src
 )
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_ALL_SOURCE})
+# Линковка с raylib
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
-target_compile_features(${ENGINE_PROJECT_NAME} PUBLIC cxx_std_17)
+# Группировка файлов в IDE
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} 
+    FILES 
+        ${ENGINE_HEADERS}
+        ${ENGINE_SOURCES}
+)
